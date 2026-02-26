@@ -1,0 +1,348 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useSpring, useTransform, AnimatePresence } from 'framer-motion';
+import { 
+  Camera, Code, Layout, Award, MapPin, Mail, Phone, 
+  Download, ArrowUpRight, Instagram, Linkedin, ExternalLink,
+  Cpu, Palette, Video, Zap, ChevronRight
+} from 'lucide-react';
+
+// --- Components ---
+
+const CustomCursor = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    const handleHover = (e) => {
+      if (e.target.tagName === 'IMG' || e.target.closest('.viewfinder-hover')) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseover', handleHover);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseover', handleHover);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 w-12 h-12 border-2 border-[#FF3B30] rounded-full pointer-events-none z-[9999] flex items-center justify-center"
+      animate={{
+        x: mousePos.x - 24,
+        y: mousePos.y - 24,
+        scale: isHovering ? 1.5 : 1,
+        rotate: isHovering ? 90 : 0
+      }}
+      transition={{ type: 'spring', damping: 20, stiffness: 250, mass: 0.5 }}
+    >
+      <div className="w-1 h-1 bg-[#FF3B30] rounded-full" />
+      {isHovering && (
+        <span className="absolute -top-6 text-[10px] font-bold text-[#FF3B30] uppercase tracking-widest">
+          View
+        </span>
+      )}
+    </motion.div>
+  );
+};
+
+const SectionHeading = ({ number, title }) => (
+  <div className="flex items-center gap-4 mb-12">
+    <span className="text-[#FF3B30] font-mono text-lg font-bold tracking-tighter italic">/{number}</span>
+    <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white">{title}</h2>
+    <div className="h-[1px] flex-grow bg-white/10" />
+  </div>
+);
+
+const Badge = ({ text, color = "bg-[#FF3B30]" }) => (
+  <span className={`${color} text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-sm`}>
+    {text}
+  </span>
+);
+
+export default function Portfolio() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  return (
+    <div className="bg-[#0A0A0A] text-white selection:bg-[#FF3B30] selection:text-white font-sans overflow-x-hidden">
+      <CustomCursor />
+      
+      {/* Progress Bar */}
+      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-[#FF3B30] origin-left z-[10000]" style={{ scaleX }} />
+
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full z-50 p-6 flex justify-between items-center mix-blend-difference">
+        <div className="font-black text-xl tracking-tighter">K.I.C</div>
+        <div className="flex gap-8 text-[10px] uppercase font-bold tracking-widest">
+          <a href="#work" className="hover:text-[#FF3B30] transition-colors">Work</a>
+          <a href="#experience" className="hover:text-[#FF3B30] transition-colors">Log</a>
+          <a href="#contact" className="hover:text-[#FF3B30] transition-colors">Contact</a>
+        </div>
+      </nav>
+
+      {/* HERO SECTION */}
+      <section className="relative min-h-screen flex flex-col justify-center px-6 md:px-20 pt-20">
+        <div className="absolute top-40 right-10 opacity-10 hidden lg:block">
+          <p className="text-[200px] font-black leading-none select-none tracking-tighter">ZENITH</p>
+        </div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="relative z-10"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Badge text="Founder of Zenith Kreative" color="bg-white text-black" />
+            <div className="flex items-center gap-2 text-[#FF3B30] font-mono text-sm">
+              <MapPin size={14} /> Harare, Zimbabwe
+            </div>
+          </div>
+
+          <h1 className="text-6xl md:text-[120px] font-black leading-[0.85] tracking-tighter mb-8 uppercase">
+            Kudakwashe<br />
+            <span className="text-[#FF3B30]">Ian Chimuti</span>
+          </h1>
+
+          <div className="grid md:grid-cols-2 gap-12 items-end">
+            <div>
+              <p className="text-2xl md:text-4xl font-light leading-tight text-zinc-400">
+                Creative Media & <span className="text-white font-bold italic underline decoration-[#FF3B30]">IT Specialist</span>.
+                Crafting visual stories and technical solutions since 2020.
+              </p>
+            </div>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-4">
+                <button className="bg-[#FF3B30] hover:bg-white hover:text-black transition-all duration-300 text-white px-8 py-4 font-black uppercase tracking-widest flex items-center gap-2 group">
+                  View Projects <ArrowUpRight className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </button>
+                <button className="border border-white/20 hover:border-[#FF3B30] transition-all px-8 py-4 font-black uppercase tracking-widest flex items-center gap-2">
+                  CV <Download size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* DYNAMIC BENTO GALLERY */}
+      <section id="work" className="py-24 px-6 md:px-20">
+        <SectionHeading number="01" title="The Creative Stream" />
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-auto md:h-[1000px]">
+          {/* Design Col - Column 1 & 2 */}
+          <motion.div 
+            whileHover={{ y: -10 }}
+            className="md:col-span-2 md:row-span-2 bg-zinc-900 overflow-hidden relative group viewfinder-hover border border-white/5"
+          >
+            <img 
+              src="https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80" 
+              alt="Graphic Design Portfolio"
+              className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
+            />
+            <div className="absolute bottom-0 left-0 p-8 w-full bg-gradient-to-t from-black to-transparent">
+              <Badge text="Branding & Design" />
+              <h3 className="text-3xl font-black mt-2">UTO DELICIOUS CAKES</h3>
+              <p className="text-sm text-zinc-400 mt-2 uppercase tracking-widest">Visual Identity & Packaging</p>
+            </div>
+          </motion.div>
+
+          {/* Photo Col - Column 3 */}
+          <motion.div 
+            whileHover={{ y: -10 }}
+            className="md:col-span-1 md:row-span-1 bg-zinc-900 overflow-hidden relative group viewfinder-hover border border-white/5"
+          >
+            <img 
+              src="https://images.unsplash.com/photo-1531058285117-a5016209b70b?auto=format&fit=crop&q=80" 
+              alt="Sports Photography"
+              className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
+            />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <Camera size={40} className="text-[#FF3B30]" />
+            </div>
+            <div className="absolute bottom-4 left-4">
+              <Badge text="Sports" />
+            </div>
+          </motion.div>
+
+          {/* Video Col - Column 4 */}
+          <motion.div 
+            whileHover={{ y: -10 }}
+            className="md:col-span-1 md:row-span-2 bg-zinc-900 overflow-hidden relative group border border-[#FF3B30]/30"
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Video className="text-[#FF3B30] animate-pulse" size={48} />
+              <span className="absolute mt-20 font-mono text-[10px] tracking-widest uppercase">DaVinci Resolve Production</span>
+            </div>
+            {/* Replace with <video src=""> or <iframe> */}
+            <div className="absolute bottom-8 left-8">
+              <h3 className="text-xl font-black italic">CINEMATIC SHOWREEL</h3>
+              <p className="text-[10px] text-zinc-400 uppercase tracking-widest">2023 - 2024</p>
+            </div>
+          </motion.div>
+
+          {/* Studio Col - Column 3 Row 2 */}
+          <motion.div 
+            whileHover={{ y: -10 }}
+            className="md:col-span-1 md:row-span-1 bg-zinc-900 overflow-hidden relative group viewfinder-hover border border-white/5"
+          >
+            <img 
+              src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80" 
+              alt="Studio Photography"
+              className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
+            />
+            <div className="absolute bottom-4 left-4">
+              <Badge text="Studio" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* EXPERIENCE & TIMELINE */}
+      <section id="experience" className="py-24 bg-[#0F0F0F] px-6 md:px-20 border-y border-white/5">
+        <SectionHeading number="02" title="Professional Log" />
+        
+        <div className="grid lg:grid-cols-12 gap-12">
+          {/* Main Experience */}
+          <div className="lg:col-span-8 space-y-12">
+            {[
+              {
+                role: "Media & IT Specialist",
+                company: "Special Olympics Zimbabwe",
+                period: "2022 - PRESENT",
+                impact: "Increased digital engagement by 30% through strategic photography & UI design.",
+                desc: "Managing full-spectrum IT infrastructure while directing all media output including high-impact posters and event coverage."
+              },
+              {
+                role: "Junior Graphic Designer",
+                company: "Luxenova Studio",
+                period: "2021 - 2022",
+                impact: "International Portfolio Exposure",
+                desc: "Focused on upmarket, trending design aesthetics for high-end international clients. Mastered the art of luxury visual storytelling."
+              }
+            ].map((exp, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                className="group relative pl-8 border-l-2 border-white/10 hover:border-[#FF3B30] transition-colors"
+              >
+                <div className="absolute -left-1.5 top-0 w-3 h-3 bg-[#FF3B30] rounded-full scale-0 group-hover:scale-100 transition-transform" />
+                <span className="text-[#FF3B30] font-mono text-sm tracking-tighter">{exp.period}</span>
+                <h3 className="text-3xl font-black uppercase mt-2 group-hover:italic transition-all">{exp.role}</h3>
+                <h4 className="text-zinc-400 font-bold mb-4">{exp.company}</h4>
+                <p className="text-zinc-500 max-w-xl mb-4">{exp.desc}</p>
+                <div className="inline-block bg-[#FF3B30]/10 border border-[#FF3B30]/30 px-4 py-2 rounded text-[#FF3B30] text-xs font-bold uppercase tracking-widest">
+                   Metric: {exp.impact}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Wall of Excellence */}
+          <div className="lg:col-span-4 bg-black p-8 border border-white/5">
+            <h3 className="text-xl font-black uppercase mb-8 flex items-center gap-2">
+              <Award className="text-[#FF3B30]" /> Wall of Excellence
+            </h3>
+            <ul className="space-y-6">
+              {[
+                { title: "Outstanding IT Student Award", meta: "Academic Excellence" },
+                { title: "Excellency Leadership Award", meta: "Peer Recognition" },
+                { title: "President of Quiz Club", meta: "Prince Edward School" },
+                { title: "Toastmasters President", meta: "Public Speaking & Leadership" }
+              ].map((award, idx) => (
+                <li key={idx} className="border-b border-white/5 pb-4">
+                  <p className="font-bold text-sm uppercase tracking-tight">{award.title}</p>
+                  <p className="text-[10px] text-[#FF3B30] font-mono uppercase mt-1">{award.meta}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* TECH STACK & EDUCATION */}
+      <section className="py-24 px-6 md:px-20 overflow-hidden">
+        <div className="grid md:grid-cols-2 gap-20">
+          <div>
+            <SectionHeading number="03" title="Foundation" />
+            <div className="p-8 border border-white/10 relative">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Code size={80} />
+              </div>
+              <h3 className="text-2xl font-black uppercase mb-4">Prince Edward School</h3>
+              <p className="text-zinc-400 mb-6 leading-relaxed">
+                Interdisciplinary foundation focusing on Business, Computer Programming, 
+                and Database Systems. Developed a technical mindset that complements 
+                creative execution.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {['Database Admin', 'Social Media Marketing', 'IT Troubleshooting', 'Branding'].map(skill => (
+                  <span key={skill} className="px-3 py-1 border border-white/20 text-[10px] font-bold uppercase tracking-widest hover:bg-[#FF3B30] hover:border-[#FF3B30] transition-colors cursor-default">
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-center">
+            <h3 className="text-zinc-500 font-mono text-sm mb-4 uppercase tracking-[0.3em]">Technical Arsenal</h3>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { name: 'Adobe Illustrator', icon: <Palette size={20} /> },
+                { name: 'DaVinci Resolve', icon: <Video size={20} /> },
+                { name: 'Technical Support', icon: <Zap size={20} /> },
+                { name: 'Creative Strategy', icon: <ExternalLink size={20} /> },
+              ].map((tool) => (
+                <div key={tool.name} className="flex items-center gap-4 p-4 bg-zinc-900 border-l-4 border-[#FF3B30]">
+                  <span className="text-white">{tool.icon}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest">{tool.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER / CONTACT */}
+      <footer id="contact" className="bg-black py-24 px-6 md:px-20 border-t border-white/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 mb-20">
+            <div>
+              <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-8">
+                Let's <span className="text-[#FF3B30] italic">Manifest</span> Something Great.
+              </h2>
+              <div className="space-y-4">
+                <a href="mailto:chimutikudakwasheian@gmail.com" className="flex items-center gap-4 text-xl hover:text-[#FF3B30] transition-colors">
+                  <Mail className="text-[#FF3B30]" /> chimutikudakwasheian@gmail.com
+                </a>
+                <a href="tel:+263789502686" className="flex items-center gap-4 text-xl hover:text-[#FF3B30] transition-colors">
+                  <Phone className="text-[#FF3B30]" /> +263 789 502 686
+                </a>
+              </div>
+            </div>
+            
+            <div className="flex flex-col justify-end items-start md:items-end">
+              <div className="flex gap-6 mb-8">
+                <Instagram className="cursor-pointer hover:text-[#FF3B30] transition-colors" />
+                <Linkedin className="cursor-pointer hover:text-[#FF3B30] transition-colors" />
+              </div>
+              <p className="text-zinc-500 text-[10px] uppercase tracking-[0.5em] mb-4">© 2024 Kudakwashe Ian Chimuti</p>
+              <button className="text-[10px] font-black uppercase tracking-widest border-b-2 border-[#FF3B30] pb-1 hover:text-[#FF3B30] transition-all">
+                Back to Top
+              </button>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
